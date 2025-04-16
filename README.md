@@ -1,114 +1,146 @@
-### **Description Globale du Projet**  
-
-Ce projet est une **application de gestion de tâches (Todo List)** en temps réel, développée en **Rust** avec le framework web **Axum**. Il combine :  
-- **Un backend performant** (API REST + SSE pour les updates live).  
-- **Un frontend léger** (HTMX pour l'interactivité sans JavaScript complexe).  
-- **Une base de données PostgreSQL** pour le stockage persistant.  
-
-L'application permet :  
-✅ **Ajouter/supprimer des tâches** avec mise à jour immédiate pour tous les utilisateurs connectés.  
-✅ **Afficher une liste dynamique** sans rechargement de page (via SSE).  
-✅ **Servir des assets statiques** (CSS) pour une UI propre.  
+Here is the English translation of your project description:
 
 ---
 
-### **🛠️ Structure du Code**  
+## **📝 Project Overview**
 
-#### **1. Backend (Axum)**
-- **Routes principales** :  
-  - `GET /` → Page d’accueil (`home()`).  
-  - `GET /todos` → Récupère toutes les tâches (`fetch_todos()`).  
-  - `POST /todos` → Crée une tâche (`create_todo()`).  
-  - `DELETE /todos/:id` → Supprime une tâche (`delete_todo()`).  
-  - `GET /stream` → Flux SSE pour les updates temps réel (`handle_stream()`).  
-  - `GET /styles.css` → CSS statique (`styles()`).  
+This project is a **real-time task management application (Todo List)** built with **Rust** using the **Axum** web framework. It combines:
 
-- **Gestion des données** :  
-  - **SQLx** pour les requêtes PostgreSQL.  
-  - **Modèles** (`Todo`, `TodoNew`, `TodoUpdate`) pour structurer les données.  
+- **A high-performance backend** (REST API + SSE for live updates)
+- **A lightweight frontend** (HTMX for interactivity without complex JavaScript)
+- **A PostgreSQL database** for persistent storage
 
-- **Temps réel** :  
-  - **`BroadcastStream`** (Tokio) pour notifier les clients des changements.  
-  - **Server-Sent Events (SSE)** pour pousser les updates au frontend.  
+The application allows:
 
-#### **2. Frontend (HTMX + Templates)**
-- **Templates HTML** :  
-  - Intégration directe avec Axum (ex: `templates::TodoNewTemplate`).  
-  - Utilisation de **HTMX** pour les requêtes AJAX (`hx-post`, `hx-delete`).  
-- **CSS** : Fichier statique servi via `/styles.css`.  
-
-#### **3. Architecture**
-- **État partagé** (`AppState`) :  
-  - Contient le pool de connexions à la DB (`db`) et le canal de broadcast (`tx`).  
-- **Gestion d’erreurs** :  
-  - Centralisée via `ApiError` (erreurs SQLx, Axum, etc.).  
+- ✅ **Adding/deleting tasks** with immediate updates for all connected users
+- ✅ **Displaying a dynamic list** without page reloads (via SSE)
+- ✅ **Serving static assets** (CSS) for a clean UI
 
 ---
 
-### **🚀 Comment Lancer le Projet**  
+## **🛠️ Code Structure**
 
-#### **Prérequis**  
-1. **Rust** : Installé via [rustup](https://rustup.rs/).  
-2. **PostgreSQL** : Serveur local ou distant (avec une DB configurée).  
-3. **Variables d’environnement** : Créez un fichier `.env` à la racine :  
+### **1. Backend (Axum)**
+
+- **Main Routes**:
+  - `GET /` → Home page (`home()`)
+  - `GET /todos` → Retrieve all tasks (`fetch_todos()`)
+  - `POST /todos` → Create a task (`create_todo()`)
+  - `DELETE /todos/:id` → Delete a task (`delete_todo()`)
+  - `GET /stream` → SSE stream for real-time updates (`handle_stream()`)
+  - `GET /styles.css` → Static CSS (`styles()`)
+
+- **Data Management**:
+  - **SQLx** for PostgreSQL queries
+  - **Models** (`Todo`, `TodoNew`, `TodoUpdate`) to structure data
+
+- **Real-Time Functionality**:
+  - **`BroadcastStream`** (Tokio) to notify clients of changes
+  - **Server-Sent Events (SSE)** to push updates to the frontend
+
+### **2. Frontend (HTMX + Templates)**
+
+- **HTML Templates**:
+  - Direct integration with Axum (e.g., `templates::TodoNewTemplate`)
+  - Use of **HTMX** for AJAX requests (`hx-post`, `hx-delete`)
+
+- **CSS**: Static file served via `/styles.css`
+
+### **3. Architecture**
+
+- **Shared State** (`AppState`):
+  - Contains the database connection pool (`db`) and the broadcast channel (`tx`)
+
+- **Error Handling**:
+  - Centralized via `ApiError` (handling SQLx, Axum errors, etc.)
+
+---
+
+## **🚀 How to Run the Project**
+
+### **Prerequisites**
+
+1. **Rust**: Installed via [rustup](https://rustup.rs/)
+2. **PostgreSQL**: Local or remote server (with a configured database)
+3. **Environment Variables**: Create a `.env` file at the root:
+
    ```env
    DATABASE_URL=postgres://user:password@localhost/db_name
    ```
 
-#### **Étapes**  
-1. **Cloner le dépôt** (si applicable) :  
+### **Steps**
+
+1. **Clone the repository** (if applicable):
+
    ```bash
    git clone <repo_url>
    cd <project_dir>
    ```
 
-2. **Installer les dépendances** :  
+2. **Install dependencies**:
+
    ```bash
    cargo build
    ```
 
-3. **Appliquer les migrations SQLx** :  
+3. **Apply SQLx migrations**:
+
    ```bash
    sqlx migrate run
    ```
 
-4. **Lancer le serveur** :  
+4. **Start the server**:
+
    ```bash
    cargo run
    ```
-   - Le serveur démarre sur `http://localhost:3000`.  
 
-5. **Accéder à l’application** :  
-   - Ouvrez `http://localhost:3000` dans un navigateur.  
+   - The server starts at `http://localhost:3000`
 
----
+5. **Access the application**:
 
-### **📌 Fonctionnement en Pratique**  
-1. **Ajouter une tâche** :  
-   - Le formulaire HTMX envoie une requête `POST /todos`.  
-   - La tâche est sauvegardée en DB et broadcastée à tous les clients via SSE.  
-
-2. **Supprimer une tâche** :  
-   - Clic sur un bouton `hx-delete` → requête `DELETE /todos/:id`.  
-   - Mise à jour immédiate de l’UI pour tous les utilisateurs.  
-
-3. **Streaming temps réel** :  
-   - La page `/stream` écoute les événements SSE et met à jour la liste automatiquement.  
+   - Open `http://localhost:3000` in a browser
 
 ---
 
-### **🔧 Debugging**  
-- **Logs** : Vérifiez les logs du serveur (`cargo run`).  
-- **Erreurs SQLx** : Activez le logging avec `RUST_LOG=sqlx=info`.  
-- **SSE** : Testez avec `curl http://localhost:3000/stream` pour voir les événements.  
+## **📌 Practical Functionality**
+
+1. **Add a Task**:
+   - The HTMX form sends a `POST /todos` request
+   - The task is saved in the database and broadcasted to all clients via SSE
+
+2. **Delete a Task**:
+   - Click on an `hx-delete` button → `DELETE /todos/:id` request
+   - Immediate UI update for all users
+
+3. **Real-Time Streaming**:
+   - The `/stream` page listens for SSE events and automatically updates the list
 
 ---
 
-### **🌍 Déploiement**  
-- **Cloud** : Utilisez **Docker** + **AWS/Google Cloud** (avec image Rust + PostgreSQL).  
-- **Render/Heroku** : Configurez le buildpack Rust et la DB.  
+## **🔧 Debugging**
 
---- 
+- **Logs**: Check server logs (`cargo run`)
+- **SQLx Errors**: Enable logging with `RUST_LOG=sqlx=info`
+- **SSE**: Test with `curl http://localhost:3000/stream` to see events
 
-Un projet **minimaliste mais puissant** pour explorer Rust, Axum, et HTMX ensemble ! 🦀  
+---
 
+## **🌍 Deployment**
+
+- **Cloud**: Use **Docker** + **AWS/Google Cloud** (with Rust + PostgreSQL image)
+- **Render/Heroku**: Configure Rust buildpack and the database
+
+---
+
+A **minimalist yet powerful** project to explore Rust, Axum, and HTMX together! 🦀
+
+---
+
+For further insights and examples, you might find the following resources helpful:
+
+- [HTMX Todo List with Axum and Tailwind CSS](https://github.com/BenJeau/htmx-todo)
+- [Rust Axum Askama HTMX Todo App](https://github.com/emarifer/rust-axum-askama-htmx-todoapp)
+- [Build an App with Rust and HTMX](https://medium.com/@eoinmitchell39/learn-rust-and-htmx-with-a-todo-application-055cf5bbf6cd)
+
+Feel free to explore these projects to deepen your understanding and enhance your application. 
